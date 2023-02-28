@@ -1,13 +1,8 @@
-import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import App from "../App";
 import SetScore from "./SetScore";
 export default function ImageCards() {
-
-
   let deck = [];
- 
 
   const options = {
     method: "GET",
@@ -18,7 +13,7 @@ export default function ImageCards() {
     },
   };
 
-  const { isLoading, error, data,} = useQuery({
+  const { isLoading, error, data, refetch } = useQuery({
     queryKey: ["cards"],
     queryFn: () => axios.request(options).then((res) => res.data),
     refetchOnmount: false,
@@ -32,29 +27,14 @@ export default function ImageCards() {
   if (isLoading) return "Loading...";
   if (error) return error.message;
 
-
-  
-    const randomizedData = data.sort(() => 0.5 - Math.random());
-    const cleaned = randomizedData.filter((randomizedData) => randomizedData.img);
-    deck = cleaned.slice(0, 20);
-    console.log(deck)
-
-    
-  
+  const randomizedData = data.sort(() => 0.5 - Math.random());
+  const cleaned = randomizedData.filter((randomizedData) => randomizedData.img);
+  deck = cleaned.slice(20, 40);
+  console.log(deck);
 
   return (
     <div>
-      <SetScore/>
-      <div className="flexContainer">
-        {deck.map((card, index) => {
-          return (
-            <div key={index}>
-              <img alt="" src={card.img} />
-          
-            </div>
-          );
-        })}
-      </div>
+      <SetScore deck={deck} refetch={refetch} />
     </div>
   );
 }
