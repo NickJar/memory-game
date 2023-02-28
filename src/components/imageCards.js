@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-
-
-
+import App from "../App";
+import SetScore from "./SetScore";
 export default function ImageCards() {
+
+
+  let deck = [];
+ 
 
   const options = {
     method: "GET",
@@ -15,32 +18,42 @@ export default function ImageCards() {
     },
   };
 
-  const { isLoading, error, data, isFetching } = useQuery({
+  const { isLoading, error, data,} = useQuery({
     queryKey: ["cards"],
     queryFn: () => axios.request(options).then((res) => res.data),
+    refetchOnmount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+    retry: false,
+    staleTime: Infinity,
+    cacheTime: Infinity,
   });
 
   if (isLoading) return "Loading...";
   if (error) return error.message;
 
-  console.log(data);
+
+  
+    const randomizedData = data.sort(() => 0.5 - Math.random());
+    const cleaned = randomizedData.filter((randomizedData) => randomizedData.img);
+    deck = cleaned.slice(0, 20);
+    console.log(deck)
+
+    
+  
 
   return (
     <div>
-      <div>
-        {" "}
-        <div className="flexContainer">
-          {data.map( function (card, index) {
-          <div key={index}><img alt="" src={card.img} /></div>
-          console.log(index)
-          if(index > 1345 && index < 1420){
-            return  <div key={index}><img alt="" src={card.img} /></div>
-          } 
-        
-          })}
-        
+      <SetScore/>
+      <div className="flexContainer">
+        {deck.map((card, index) => {
+          return (
+            <div key={index}>
+              <img alt="" src={card.img} />
           
-        </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
